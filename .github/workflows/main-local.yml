@@ -1,6 +1,5 @@
 name: Run Java Git Diff By Local
 
-
 on:
   push:
     branches:
