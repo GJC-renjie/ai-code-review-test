@@ -1,13 +1,12 @@
 name: Run Java Git Diff By Local
 
-
 on:
   push:
     branches:
-      - master
+      - *
   pull_request:
     branches:
-      - master
+      - *
 
 jobs:
   build-and-run:
