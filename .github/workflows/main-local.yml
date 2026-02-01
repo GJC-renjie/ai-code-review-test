@@ -40,7 +40,13 @@ jobs:
         run: mvn -B test --file pom.xml
         
       - name: Run Java code
-        run: mvn -B exec:java -Dexec.mainClass="plus.gaga.middleware.sdk.OpenAiCodeReview"
+        run: |
+          # 先编译
+          mvn clean compile -DskipTests
+          
+          # 然后进入子模块运行
+          cd openai-code-review-sdk
+          mvn exec:java -Dexec.mainClass="plus.gaga.middleware.sdk.OpenAiCodeReview"
 
         # run: |
         #   cd openai-code-review-sdk/src/main/java
