@@ -20,13 +20,35 @@ jobs:
           fetch-depth: 2  # 检出最后两个提交，以便可以比较 HEAD~1 和 HEAD
 
       - name: Set up JDK 11
-        uses: actions/setup-java@v2
+        uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'  # 你可以选择其他发行版，如 'adopt' 或 'zulu'
+          distribution: 'temurin'
           java-version: '11'
+          cache: maven
+          
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
 
+      - name: Build with Maven
+        run: mvn -B clean compile --file pom.xml
+        
+      - name: Run tests
+        run: mvn -B test --file pom.xml
+        
       - name: Run Java code
         run: |
-          cd openai-code-review-sdk/src/main/java
-          javac plus/gaga/middleware/sdk/OpenAiCodeReview.java
-          java plus.gaga.middleware.sdk.OpenAiCodeReview
+          # 先编译
+          mvn clean compile -DskipTests
+          
+          # 然后进入子模块运行
+          cd openai-code-review-sdk
+          mvn exec:java -Dexec.mainClass="plus.gaga.middleware.sdk.OpenAiCodeReview"
+
+        # run: |
+        #   cd openai-code-review-sdk/src/main/java
+        #   javac plus/gaga/middleware/sdk/OpenAiCodeReview.java
+        #   java plus.gaga.middleware.sdk.OpenAiCodeReview
